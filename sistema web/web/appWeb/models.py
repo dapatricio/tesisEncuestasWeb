@@ -15,6 +15,7 @@ class Area(models.Model):
 class Tema(models.Model):
 	idTema=models.AutoField(primary_key=True)
 	nombTema=models.CharField(max_length=75, verbose_name='Nombre Area de Competencia')
+	detalleTema=models.CharField(max_length=75, verbose_name='Detalle Tema')
 
 	class Meta:
 		db_table='tema'
@@ -39,6 +40,7 @@ class Dependencia(models.Model):
 	tipoDep=models.ForeignKey(tipoDep, models.DO_NOTHING, db_column='idTipoDep')
 	idArea=models.ForeignKey(area, models.DO_NOTHING, db_column='idArea')
 
+
 	class Meta:
 		db_table='dependencia'
 
@@ -48,6 +50,7 @@ class Dependencia(models.Model):
 class Subtema(models.Model):
 	idSubtema=models.AutoField(primary_key=True)
 	nombSubtema=models.CharField(max_length=75, verbose_name='Nombre Competencia')
+	detalleSubtema=models.CharField(max_length=75, verbose_name='Detalle Subtema')
 
 	idTema=models.ForeignKey(tema, models.DO_NOTHING, db_column='idTema')
 
