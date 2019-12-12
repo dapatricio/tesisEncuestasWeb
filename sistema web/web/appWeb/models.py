@@ -3,7 +3,7 @@ from django.db import models
 # Create your models here.
 
 class Area(models.Model):
-	idArea=models.AutoField(primary_key=True)
+	id_area=models.AutoField(primary_key=True)
 	nombArea=models.CharField(max_length=75, verbose_name='Nombre Areas')
 
 	class Meta:
@@ -13,7 +13,7 @@ class Area(models.Model):
 		return u'%s' %self.nombArea
 
 class Tema(models.Model):
-	idTema=models.AutoField(primary_key=True)
+	id_tema=models.AutoField(primary_key=True)
 	nombTema=models.CharField(max_length=75, verbose_name='Nombre Area de Competencia')
 	detalleTema=models.CharField(max_length=75, verbose_name='Detalle Tema')
 
@@ -24,7 +24,7 @@ class Tema(models.Model):
 		return u'%s' %self.nombTema
 
 class TipoCuest(models.Model):
-	idTipoCuest=models.AutoField(primary_key=True)
+	id_tipoCuest=models.AutoField(primary_key=True)
 	nombCuest=models.CharField(max_length=75, verbose_name='Tipo de cuestionario')
 
 	class Meta:
@@ -33,12 +33,23 @@ class TipoCuest(models.Model):
 	def __str__(self):
 		return u'%s' %self.nombCuest	
 
+class TipoDep(models.Model):
+	id_tipoDep=models.AutoField(primary_key=True)
+	nombTipoDep=models.CharField(max_length=75, verbose_name='Nombre Tipo de Dependencia')
+	tipoDepartamento=models.IntegerField()
+
+	class Meta:
+		db_table='tipoDep'
+
+	def __str__(self):
+		return u'%s' %self.nombTipoDep	
+
 class Dependencia(models.Model):
-	idDependencia=models.AutoField(primary_key=True)
+	id_dependencia=models.AutoField(primary_key=True)
 	nombDependencia=models.CharField(max_length=75, verbose_name='Nombre Dependencia')
 
-	tipoDep=models.ForeignKey(tipoDep, models.DO_NOTHING, db_column='idTipoDep')
-	idArea=models.ForeignKey(area, models.DO_NOTHING, db_column='idArea')
+	id_tipoDep=models.ForeignKey(TipoDep, models.DO_NOTHING, db_column='id_tipoDep')
+	id_area=models.ForeignKey(Area, models.DO_NOTHING, db_column='id_area')
 
 
 	class Meta:
@@ -48,11 +59,11 @@ class Dependencia(models.Model):
 		return u'%s' %self.nombDependencia	
 
 class Subtema(models.Model):
-	idSubtema=models.AutoField(primary_key=True)
+	id_subtema=models.AutoField(primary_key=True)
 	nombSubtema=models.CharField(max_length=75, verbose_name='Nombre Competencia')
 	detalleSubtema=models.CharField(max_length=75, verbose_name='Detalle Subtema')
 
-	idTema=models.ForeignKey(tema, models.DO_NOTHING, db_column='idTema')
+	id_tema=models.ForeignKey(Tema, models.DO_NOTHING, db_column='id_tema')
 
 	class Meta:
 		db_table='subtema'
@@ -60,37 +71,27 @@ class Subtema(models.Model):
 	def __str__(self):
 		return u'%s' %self.nombSubtema	
 
-class TipoDep(models.Model):
-	idTipoDep=models.AutoField(primary_key=True)
-	nombTipoDep=models.CharField(max_length=75, verbose_name='Nombre Tipo de Dependencia')
-	tipoDep=models.IntegerField()
-
-	class Meta:
-		db_table='tipoDep'
-
-	def __str__(self):
-		return u'%s' %self.nombTipoDep	
-
-class TipoUsr(models.Model):
-	idTipoUsr=models.AutoField(primary_key=True)
-	nombTipoIsr=models.CharField(max_length=75, verbose_name='Nombre Usuario')
-	tipoUsr=models.IntegerField()
-
-	class Meta:
-		db_table='tipoUsr'
-
-	def __str__(self):
-		return u'%s' %self.nombTipoUsr
-
 class Usuarios(models.Model):
 	idUsr=models.AutoField(primary_key=True)
 	nombUsr=models.CharField(max_length=75, verbose_name='Nombre Usuario')
 	cedula=models.CharField(max_length=11, verbose_name='Cédula Usuario')
 	correo=models.CharField(max_length=75, verbose_name='Correo Usuario')
 	clave=models.CharField(max_length=75, verbose_name='Contraseña')
+	ESTUDIANTE='E'
+	DOCENTE='D'
+	ADMINISTRATIVO='A'
+	USUARIOS_CHOICES=(
+        (ESTUDIANTE, 'Estudiante'),
+        (DOCENTE, 'Docente'),
+        (ADMINISTRATIVO, 'Administrativo'),
+    )
+    tipo_usuario = models.CharField(
+    	max_length=1,
+    	choices=USUARIOS_CHOICES,
+    	default=ESTUDIANTE,
+    	)
 
-	idTipoUsr=models.ForeignKey(tipoUsr, models.DO_NOTHING, db_column='idTipoUsr')
-	idDependencia=models.ForeignKey(dependencia, models.DO_NOTHING, db_column='idDependencia')
+	idDependencia=models.ForeignKey(Dependencia, models.DO_NOTHING, db_column='id_dependencia')
 
 	class Meta:
 		db_table='usuarios'
@@ -99,12 +100,12 @@ class Usuarios(models.Model):
 		return u'%s' %self.nombUsr			
 
 class Pregunta(models.Model):
-	idPregunta=models.AutoField(primary_key=True)
+	id_pregunta=models.AutoField(primary_key=True)
 	pregunta=models.CharField(max_length=250, verbose_name='Pregunta')
 	ayuda=models.CharField(max_length=100, verbose_name='Ayuda para la Pregunta')
 
-	idTipoCuest=models.ForeignKey(tipoCuest, models.DO_NOTHING, db_column='idTipoCuest')
-	idSubtema=models.ForeignKey(subtema, models.DO_NOTHING, db_column='idSubtema')
+	id_tipoCuest=models.ForeignKey(TipoCuest, models.DO_NOTHING, db_column='id_tipoCuest')
+	id_subtema=models.ForeignKey(Subtema, models.DO_NOTHING, db_column='id_subtema')
 
 	class Meta:
 		db_table='pregunta'
@@ -113,11 +114,11 @@ class Pregunta(models.Model):
 		return u'%s' %self.pregunta	
 
 class Recomendacion(models.Model):
-	idRecomendacion=models.AutoField(primary_key=True)
+	id_recomendacion=models.AutoField(primary_key=True)
 	recomendacion=models.CharField(max_length=75, verbose_name='Recomendación valor respuesta')
 	valor=models.IntegerField()
 
-	idPregunta=models.ForeignKey(pregunta, models.DO_NOTHING, db_column='idPregunta')
+	id_pregunta=models.ForeignKey(Pregunta, models.DO_NOTHING, db_column='id_pregunta')
 
 	class Meta:
 		db_table='recomendacion'
@@ -126,11 +127,11 @@ class Recomendacion(models.Model):
 		return u'%s' %self.recomendacion
 
 class Respuesta(models.Model):
-	idRespuesta=models.AutoField(primary_key=True)
+	id_respuesta=models.AutoField(primary_key=True)
 	respuesta=models.CharField(max_length=75, verbose_name='Respuesta pregunta')
 	valorRta=models.IntegerField()
 
-	idPregunta=models.ForeignKey(pregunta, models.DO_NOTHING, db_column='idPregunta')
+	id_pregunta=models.ForeignKey(Pregunta, models.DO_NOTHING, db_column='id_pregunta')
 
 	class Meta:
 		db_table='respuesta'
@@ -139,11 +140,11 @@ class Respuesta(models.Model):
 		return u'%s' %self.respuesta
 
 class RtaUsr(models.Model):
-	idRtaUser=models.AutoField(primary_key=True)
+	id_rtaUser=models.AutoField(primary_key=True)
 	rtaUser=models.CharField(max_length=75, verbose_name='Respuesta usuario')
 
-	idPregunta=models.ForeignKey(pregunta, models.DO_NOTHING, db_column='idPregunta')
-	idUsr=models.ForeignKey(usuario, models.DO_NOTHING, db_column='idUsr')
+	id_pregunta=models.ForeignKey(Pregunta, models.DO_NOTHING, db_column='id_pregunta')
+	id_usr=models.ForeignKey(Usuarios, models.DO_NOTHING, db_column='id_usr')
 
 	class Meta:
 		db_table='rtaUser'
@@ -152,11 +153,11 @@ class RtaUsr(models.Model):
 		return u'%s' %self.rtaUser
 
 class Nivel(models.Model):
-	idNivel=models.AutoField(primary_key=True)
-	nomNivel=models.CharField(max_length=75, verbose_name='Nivel')
+	id_nivel=models.AutoField(primary_key=True)
+	nomNivel=models.CharField(max_length=75, verbose_name='Valor Nivel')
 
-	idSubtema=models.ForeignKey(subtema, models.DO_NOTHING, db_column='idSubtema')
-	idDependencia=models.ForeignKey(dependencia, models.DO_NOTHING, db_column='idDependencia')
+	id_subtema=models.ForeignKey(Subtema, models.DO_NOTHING, db_column='id_subtema')
+	id_dependencia=models.ForeignKey(Dependencia, models.DO_NOTHING, db_column='id_dependencia')
 
 	class Meta:
 		db_table='nivel'
